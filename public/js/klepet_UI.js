@@ -25,15 +25,16 @@ function procesirajVnosUporabnika(klepetApp, socket) {
 
   if (sporocilo.charAt(0) == '/') {
     sistemskoSporocilo = klepetApp.procesirajUkaz(sporocilo);
-    if (sistemskoSporocilo) {
+      if (sistemskoSporocilo) {
       $('#sporocila').append(divElementHtmlTekst(sistemskoSporocilo));
+      sporocilo = dodajSlike(sporocilo);
     }
   } else {
     sporocilo = filtirirajVulgarneBesede(sporocilo);
     klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
     $('#sporocila').append(divElementEnostavniTekst(sporocilo));
     $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight'));
-    dodajSlike(sporocilo);
+    sporocilo = dodajSlike(sporocilo);
   }
 
   $('#poslji-sporocilo').val('');
@@ -147,6 +148,7 @@ function dodajSlike(sporocilo) {
     if(povezave[i] != 'http://sandbox.lavbic.net/teaching/OIS/gradivo/wink.png' && povezave[i] != 'http://sandbox.lavbic.net/teaching/OIS/gradivo/smiley.png' && povezave[i] != 'http://sandbox.lavbic.net/teaching/OIS/gradivo/like.png'
       && povezave[i] != 'http://sandbox.lavbic.net/teaching/OIS/gradivo/kiss.png' && povezave[i] != 'http://sandbox.lavbic.net/teaching/OIS/gradivo/sad.png'){
       $('#sporocila').append("<img src='" + povezave[i] + "'width=200px style='margin-left:20px'/>");
+      
     }  
   }
 }
