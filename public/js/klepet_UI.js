@@ -1,11 +1,12 @@
 function divElementEnostavniTekst(sporocilo) {
   var jeSmesko = sporocilo.indexOf('http://sandbox.lavbic.net/teaching/OIS/gradivo/') > -1;
   var jeSlika = (sporocilo.match(/\bhttp:\/\//gi) || sporocilo.match(/\bhttps:\/\//gi)) && (sporocilo.match(/\b\.jpg\b/gi) || sporocilo.match(/\b\.png\b/gi) || sporocilo.match(/\b\.gif\b/gi));
+  var jeVideo = (sporocilo.match(new RegExp('\\bhttps:\/\/www.youtube.com\/watch\\?v=\\S*\\b', 'gi')));
   if (jeSmesko) {
     sporocilo = sporocilo.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace('&lt;img', '<img').replace('png\' /&gt;', 'png\' />');
     return $('<div style="font-weight: bold"></div>').html(sporocilo);
   } 
-  else if(jeSlika) {
+  else if(jeSlika || jeVideo) {
     return $('<div style="font-weight: bold"></div>').html(sporocilo);
   }
 
@@ -27,11 +28,9 @@ function procesirajVnosUporabnika(klepetApp, socket) {
     sistemskoSporocilo = klepetApp.procesirajUkaz(sporocilo);
       if (sistemskoSporocilo) {
       $('#sporocila').append(divElementHtmlTekst(sistemskoSporocilo));
-
-      sporocilo = dodajSlike(sporocilo);
-
-      sporocilo = addVideo(sporocilo);
-
+      
+      dodajSlike(sporocilo);
+      addVideo(sporocilo);
     }
   } else {
     sporocilo = filtirirajVulgarneBesede(sporocilo);
@@ -39,10 +38,8 @@ function procesirajVnosUporabnika(klepetApp, socket) {
     $('#sporocila').append(divElementEnostavniTekst(sporocilo));
     $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight'));
 
-    sporocilo = dodajSlike(sporocilo);
-
-    sporocilo = addVideo(sporocilo);
-
+    dodajSlike(sporocilo);
+    addVideo(sporocilo);
   }
 
   $('#poslji-sporocilo').val('');
@@ -104,7 +101,6 @@ $(document).ready(function() {
     $('#sporocila').append(novElement);
 
     dodajSlike(sporocilo.besedilo);
-
     addVideo(sporocilo.besedilo);
 
   });
@@ -180,7 +176,6 @@ function dodajSlike(sporocilo) {
   }
 }
 
-  
 function addVideo(vnos) {
   var link = vnos.match(new RegExp('\\bhttps:\/\/www.youtube.com\/watch\\?v=\\S*\\b', 'gi')); 
   for(var i in link) {
