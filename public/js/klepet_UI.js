@@ -1,9 +1,15 @@
 function divElementEnostavniTekst(sporocilo) {
   var jeSmesko = sporocilo.indexOf('http://sandbox.lavbic.net/teaching/OIS/gradivo/') > -1;
+  var jeSlika = (sporocilo.match(/\bhttp:\/\//gi) || sporocilo.match(/\bhttps:\/\//gi)) && (sporocilo.match(/\b\.jpg\b/gi) || sporocilo.match(/\b\.png\b/gi) || sporocilo.match(/\b\.gif\b/gi));
   if (jeSmesko) {
     sporocilo = sporocilo.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace('&lt;img', '<img').replace('png\' /&gt;', 'png\' />');
     return $('<div style="font-weight: bold"></div>').html(sporocilo);
-  } else {
+  } 
+  else if(jeSlika) {
+    return $('<div style="font-weight: bold"></div>').html(sporocilo);
+  }
+
+  else {
     return $('<div style="font-weight: bold;"></div>').text(sporocilo);
   }
 }
@@ -19,17 +25,20 @@ function procesirajVnosUporabnika(klepetApp, socket) {
 
   if (sporocilo.charAt(0) == '/') {
     sistemskoSporocilo = klepetApp.procesirajUkaz(sporocilo);
-    if (sistemskoSporocilo) {
+      if (sistemskoSporocilo) {
       $('#sporocila').append(divElementHtmlTekst(sistemskoSporocilo));
+      sporocilo = dodajSlike(sporocilo);
     }
   } else {
     sporocilo = filtirirajVulgarneBesede(sporocilo);
     klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
     $('#sporocila').append(divElementEnostavniTekst(sporocilo));
     $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight'));
+    sporocilo = dodajSlike(sporocilo);
   }
 
   $('#poslji-sporocilo').val('');
+  
 }
 
 var socket = io.connect();
@@ -76,6 +85,7 @@ $(document).ready(function() {
   socket.on('sporocilo', function (sporocilo) {
     var novElement = divElementEnostavniTekst(sporocilo.besedilo);
     $('#sporocila').append(novElement);
+    dodajSlike(sporocilo.besedilo);
   });
   
   socket.on('kanali', function(kanali) {
@@ -135,4 +145,15 @@ function dodajSmeske(vhodnoBesedilo) {
       preslikovalnaTabela[smesko] + "' />");
   }
   return vhodnoBesedilo;
+}
+
+function dodajSlike(sporocilo) {
+  var povezave = sporocilo.match(new RegExp('\\bhttps?:\/\/\\S*\\.(png|jpg|gif)\\b', 'gi')); 
+  for(var i in povezave) {
+    if(povezave[i] != 'http://sandbox.lavbic.net/teaching/OIS/gradivo/wink.png' && povezave[i] != 'http://sandbox.lavbic.net/teaching/OIS/gradivo/smiley.png' && povezave[i] != 'http://sandbox.lavbic.net/teaching/OIS/gradivo/like.png'
+      && povezave[i] != 'http://sandbox.lavbic.net/teaching/OIS/gradivo/kiss.png' && povezave[i] != 'http://sandbox.lavbic.net/teaching/OIS/gradivo/sad.png'){
+      $('#sporocila').append("<img src='" + povezave[i] + "'width=200px style='margin-left:20px'/>");
+      
+    }  
+  }
 }
