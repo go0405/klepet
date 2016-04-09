@@ -180,6 +180,7 @@ function addVideo(vnos) {
   var link = vnos.match(new RegExp('\\bhttps:\/\/www.youtube.com\/watch\\?v=\\S*\\b', 'gi')); 
   for(var i in link) {
      $('#sporocila').append("<iframe src='https://www.youtube.com/embed/"+ link[i].substring(32, link[i].length) +"'allowfullscreen width=200px height=150px style='margin-left:20px'></iframe>");
+     
   }
 }
 
